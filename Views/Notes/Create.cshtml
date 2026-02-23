@@ -1,0 +1,11 @@
+@model controllermvc.Models.Note
+
+<h2>Yeni Not</h2>
+
+<form asp-action="Create" method="post">
+    <input asp-for="Title" placeholder="Başlık" />
+    <br />
+    <textarea asp-for="Content" placeholder="İçerik"></textarea>
+    <br />
+    <button type="submit">Kaydet</button>
+</form>

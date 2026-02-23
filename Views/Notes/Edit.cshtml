@@ -1,0 +1,14 @@
+@model controllermvc.Models.Note
+
+<h2>Not Düzenle</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <input asp-for="Title" />
+    <br />
+    <textarea asp-for="Content"></textarea>
+    <br />
+
+    <button type="submit">Güncelle</button>
+</form>
