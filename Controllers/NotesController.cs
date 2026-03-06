@@ -1,61 +1,72 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using controllermvc.Models;
+using controllermvc.Data;
 
 namespace controllermvc.Controllers
 {
     public class NotesController : Controller
     {
-        
-        private static List<Note> notes = new List<Note>();
+        private readonly NoteDbContext _context;
 
-        
-        public IActionResult Index()
+        public NotesController(NoteDbContext context)
         {
+            _context = context;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            var notes = await _context.Notes.ToListAsync();
             return View(notes);
         }
 
-        
         public IActionResult Create()
         {
             return View();
         }
 
-        
         [HttpPost]
-        public IActionResult Create(Note note)
+        public async Task<IActionResult> Create(Note note)
         {
-            note.Id = notes.Count + 1;
             note.CreatedDate = DateTime.Now;
 
-            notes.Add(note);
+            _context.Notes.Add(note);
+            await _context.SaveChangesAsync();
 
             return RedirectToAction("Index");
         }
 
-        
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
-            var note = notes.FirstOrDefault(x => x.Id == id);
+            var note = await _context.Notes.FindAsync(id);
+            if (note == null) return NotFound();
+
             return View(note);
         }
 
-        
         [HttpPost]
-        public IActionResult Edit(Note updatedNote)
+        public async Task<IActionResult> Edit(Note updatedNote)
         {
-            var note = notes.FirstOrDefault(x => x.Id == updatedNote.Id);
+            var note = await _context.Notes.FindAsync(updatedNote.Id);
+            if (note == null) return NotFound();
 
             note.Title = updatedNote.Title;
             note.Content = updatedNote.Content;
 
+            await _context.SaveChangesAsync();
+
             return RedirectToAction("Index");
         }
 
-        
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var note = notes.FirstOrDefault(x => x.Id == id);
-            notes.Remove(note);
+            var note = await _context.Notes.FindAsync(id);
+
+            if (note != null)
+            {
+                _context.Notes.Remove(note);
+                await _context.SaveChangesAsync();
+            }
 
             return RedirectToAction("Index");
         }
